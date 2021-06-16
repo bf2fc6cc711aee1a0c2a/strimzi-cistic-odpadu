@@ -1,6 +1,7 @@
 # Strimzi Čistič Odpadů (Drain Cleaner)
 
-**NOTE: This is not official Strimzi project!**
+**NOTE: This is not official Strimzi project!<br>
+This branch includes the OLM workaround, follow instructions [here](#native-olm) to build the image.**
 
 Strimzi Drain Cleaner is utility which helps with moving the Kafka pods deployed by [Strimzi](https://strimzi.io/) from nodes which are being drained.
 It is useful if you want the Strimzi operator to move the pods instead of Kubernetes itself.
@@ -138,9 +139,21 @@ You can then execute your native executable with: `./target/strimzi-cistic-odpad
 
 You can build the container for example using the _distro-less_ base image (use your own repository ;-)):
 
-```
+```sh
 docker build -f src/main/docker/Dockerfile.native-distroless -t quay.io/scholzj/strimzi-cistic-odpadu:latest .
 docker push quay.io/scholzj/strimzi-cistic-odpadu:latest
+```
+
+#### Native OLM
+
+The `native-olm` image is needed when deploying through an OLM bundle with the webhook configuration.
+It contains a workaround for this [TLS key issue](https://github.com/operator-framework/operator-lifecycle-manager/issues/2191).
+Once that feature will be released, we will come back to the original smaller distroless image.
+
+```sh
+mvn package -Pnative -Dquarkus.native.container-build=true
+docker build -f src/main/docker/Dockerfile.native-olm -t quay.io/mk-ci-cd/strimzi-cistic-odpadu:native-olm .
+docker push quay.io/mk-ci-cd/strimzi-cistic-odpadu:native-olm
 ```
 
 ## Test
